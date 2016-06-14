@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="aKw-vq-AM8">
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
     </dependencies>
     <scenes>
@@ -18,11 +17,8 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jeH-ol-DL0">
-                                <rect key="frame" x="20" y="84" width="270" height="200"/>
+                                <rect key="frame" x="20" y="84" width="270" height="238"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="200" id="D9F-TX-C6F"/>
-                                </constraints>
                                 <state key="normal" title="Build 1.0.2 Notes">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -30,12 +26,19 @@
                                     <action selector="build102ButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="eiL-10-b5v"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Kpz-g5-KgK">
-                                <rect key="frame" x="310" y="84" width="270" height="200"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jYS-P6-rpV">
+                                <rect key="frame" x="20" y="342" width="270" height="238"/>
                                 <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="200" id="cq8-yc-zV2"/>
-                                </constraints>
+                                <state key="normal" title="Onboarding">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="onboardingButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="JPb-K3-B5e"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Kpz-g5-KgK">
+                                <rect key="frame" x="310" y="84" width="270" height="238"/>
+                                <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="Build 1.0.3 Notes">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -43,19 +46,45 @@
                                     <action selector="build103buttonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="eqC-iP-YDv"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="meP-3W-r6I">
+                                <rect key="frame" x="310" y="342" width="270" height="238"/>
+                                <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="Parallax">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="onboardingWithParallaxButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="C0L-rA-o9c"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="jeH-ol-DL0" firstAttribute="width" secondItem="Kpz-g5-KgK" secondAttribute="width" id="5md-lA-y7P"/>
-                            <constraint firstAttribute="trailing" secondItem="Kpz-g5-KgK" secondAttribute="trailing" constant="20" id="8Ar-5u-FlO"/>
-                            <constraint firstItem="Kpz-g5-KgK" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="20" id="Rbz-WT-Ikl"/>
-                            <constraint firstItem="jeH-ol-DL0" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="W0I-Lc-Ee5"/>
-                            <constraint firstItem="Kpz-g5-KgK" firstAttribute="leading" secondItem="jeH-ol-DL0" secondAttribute="trailing" constant="20" id="ecI-bE-CbZ"/>
-                            <constraint firstItem="jeH-ol-DL0" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="20" id="ye2-18-HSn"/>
+                            <constraint firstItem="jYS-P6-rpV" firstAttribute="height" secondItem="jeH-ol-DL0" secondAttribute="height" id="94z-mT-8FL"/>
+                            <constraint firstItem="jeH-ol-DL0" firstAttribute="width" secondItem="Kpz-g5-KgK" secondAttribute="width" id="A6O-fH-yai"/>
+                            <constraint firstItem="jeH-ol-DL0" firstAttribute="height" secondItem="Kpz-g5-KgK" secondAttribute="height" id="Jrz-61-oCX"/>
+                            <constraint firstItem="jYS-P6-rpV" firstAttribute="top" secondItem="jeH-ol-DL0" secondAttribute="bottom" constant="20" id="Ogc-Fm-Cgi"/>
+                            <constraint firstItem="jYS-P6-rpV" firstAttribute="width" secondItem="jeH-ol-DL0" secondAttribute="width" id="Uca-EL-FkA"/>
+                            <constraint firstItem="jeH-ol-DL0" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="Yfh-26-U3Q"/>
+                            <constraint firstItem="meP-3W-r6I" firstAttribute="top" secondItem="Kpz-g5-KgK" secondAttribute="bottom" constant="20" id="au2-hp-kUO"/>
+                            <constraint firstItem="Kpz-g5-KgK" firstAttribute="leading" secondItem="jeH-ol-DL0" secondAttribute="trailing" constant="20" id="az9-R1-XUb"/>
+                            <constraint firstItem="meP-3W-r6I" firstAttribute="height" secondItem="jYS-P6-rpV" secondAttribute="height" id="b53-BW-7ij"/>
+                            <constraint firstItem="Kpz-g5-KgK" firstAttribute="height" secondItem="meP-3W-r6I" secondAttribute="height" id="baf-qb-ahZ"/>
+                            <constraint firstItem="jYS-P6-rpV" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="d1b-t7-xU4"/>
+                            <constraint firstItem="Kpz-g5-KgK" firstAttribute="width" secondItem="meP-3W-r6I" secondAttribute="width" id="dZe-jG-H4S"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="jYS-P6-rpV" secondAttribute="bottom" constant="20" id="euU-PC-yK5"/>
+                            <constraint firstAttribute="trailing" secondItem="Kpz-g5-KgK" secondAttribute="trailing" constant="20" id="g5G-ov-se3"/>
+                            <constraint firstItem="Kpz-g5-KgK" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="20" id="jOE-9y-m0j"/>
+                            <constraint firstItem="meP-3W-r6I" firstAttribute="leading" secondItem="jYS-P6-rpV" secondAttribute="trailing" constant="20" id="lOe-tN-ZFC"/>
+                            <constraint firstItem="meP-3W-r6I" firstAttribute="width" secondItem="jYS-P6-rpV" secondAttribute="width" id="sb0-gK-JIw"/>
+                            <constraint firstItem="jeH-ol-DL0" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="20" id="vuL-gu-b7b"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="RaiseMetrics Test App" id="GvC-Ru-0fH"/>
                     <connections>
+                        <outlet property="button1" destination="jeH-ol-DL0" id="Tna-AU-VDL"/>
+                        <outlet property="button2" destination="Kpz-g5-KgK" id="FF2-jk-YHX"/>
+                        <outlet property="button3" destination="jYS-P6-rpV" id="JM9-Tj-rbi"/>
+                        <outlet property="button4" destination="meP-3W-r6I" id="UZK-eI-INC"/>
                         <segue destination="skF-NC-rhA" kind="presentation" identifier="showNotesVC" modalPresentationStyle="overCurrentContext" modalTransitionStyle="crossDissolve" id="taq-hU-DU9"/>
                     </connections>
                 </viewController>
