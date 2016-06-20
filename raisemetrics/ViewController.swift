@@ -25,6 +25,16 @@ class ViewController: UIViewController {
         button2.layer.cornerRadius = 16.0
         button3.layer.cornerRadius = 16.0
         button4.layer.cornerRadius = 16.0
+        
+//        let langId = NSLocale.currentLocale().objectForKey(NSLocaleLanguageCode) as! String
+//        let countryId = NSLocale.currentLocale().objectForKey(NSLocaleCountryCode) as! String
+//        let language = "\(langId)-\(countryId)" // en-US on my machine
+//        
+//        print(NSLocale.currentLocale().localeIdentifier)
+        
+        
+//        let language = NSLocale.preferredLanguages()[0]
+//        print(language)
     }
     
     override func didReceiveMemoryWarning() {

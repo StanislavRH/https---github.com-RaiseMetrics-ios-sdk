@@ -17,19 +17,60 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
     var parallaxImageView = UIImageView()
     var isAnimating = false
     var activityIndicator = UIActivityIndicatorView()
+    var currentOrientation = "Portrait"
+    var serverResponse = Dictionary<String, AnyObject>()
+    var headerImageSaved = UIImage()
+    var parallaxImage = UIImage()
+    var backgroundImagesDictionary = Dictionary<String, UIImage>()
+    var imageDictionary = Dictionary<String, UIImage>()
+    var page = 100
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if UIScreen.mainScreen().bounds.size.width > UIScreen.mainScreen().bounds.size.height {
+            currentOrientation = "Landscape"
+        }
+        
         view.backgroundColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.5)
         
-        activityIndicator = UIActivityIndicatorView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - 50.0)/2, (UIScreen.mainScreen().bounds.size.height - 50.0)/2, 50.0, 50.0))
-        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge
-        activityIndicator.startAnimating()
-        view.addSubview(activityIndicator)
+        createActivityIndicator()
         
         loadNotes()
         // Do any additional setup after loading the view.
+    }
+    
+    func createActivityIndicator() {
+        // Determine the screen width and height
+        var width: CGFloat = 0.0
+        var height: CGFloat = 0.0
+        if currentOrientation == "Portrait" {
+            if UIScreen.mainScreen().bounds.size.width < UIScreen.mainScreen().bounds.size.height {
+                width = UIScreen.mainScreen().bounds.size.width
+                height = UIScreen.mainScreen().bounds.size.height
+            }
+            else {
+                width = UIScreen.mainScreen().bounds.size.height
+                height = UIScreen.mainScreen().bounds.size.width
+            }
+            height = height + 64.0
+        }
+        else {
+            if UIScreen.mainScreen().bounds.size.width > UIScreen.mainScreen().bounds.size.height {
+                width = UIScreen.mainScreen().bounds.size.width
+                height = UIScreen.mainScreen().bounds.size.height
+            }
+            else {
+                width = UIScreen.mainScreen().bounds.size.height
+                height = UIScreen.mainScreen().bounds.size.width
+            }
+            height = height + 32.0
+        }
+        
+        activityIndicator = UIActivityIndicatorView(frame: CGRectMake((width - 50.0)/2, (height - 50.0)/2, 50.0, 50.0))
+        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge
+        activityIndicator.startAnimating()
+        view.addSubview(activityIndicator)
     }
     
     override func didReceiveMemoryWarning() {
@@ -37,17 +78,21 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    func checkTheResponse(dict : Dictionary<String, AnyObject>) {
-        print(dict)
-        
-        // It's a card view with features list
-        if let card = dict["card"] as? Dictionary<String, AnyObject> {
-            createCard(card)
+    func checkTheResponse() {
+        if activityIndicator.alpha == 0 {
+            createActivityIndicator()
         }
-        // It's an Onboarding view
-        if let pages = dict["pages"] as? [Dictionary<String, AnyObject>] {
-            if let settings = dict["settings"] as? Dictionary<String, AnyObject> {
-                createOnboarding(pages, settings: settings)
+        
+        if serverResponse.count != 0 {
+            // It's a card view with features list
+            if let card = serverResponse["card"] as? Dictionary<String, AnyObject> {
+                createCard(card)
+            }
+            // It's an Onboarding view
+            if let pages = serverResponse["pages"] as? [Dictionary<String, AnyObject>] {
+                if let settings = serverResponse["settings"] as? Dictionary<String, AnyObject> {
+                    createOnboarding(pages, settings: settings)
+                }
             }
         }
     }
@@ -64,6 +109,11 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             view.addSubview(scrollView)
             activityIndicator.alpha = 0.0
             
+            scrollView.alpha = 0.0
+            UIView.animateWithDuration(0.25, animations: {
+                self.scrollView.alpha = 1.0
+            })
+            
             // Checking the parallax and setting the view background
             var isParallax = false
             
@@ -73,34 +123,104 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                 isParallax = true
                 //
                 if let checkedUrl = NSURL(string: parallaxString) {
-                    // you can use checkedUrl here
-                    let data = NSData(contentsOfURL:checkedUrl)
-                    if data != nil {
-                        let width = UIImage(data:data!)?.size.width
-                        let height = UIImage(data:data!)?.size.height
-                        print("Widht - \(width), height - \(height)")
+                    if parallaxImage.size.width > 0 {
+                        let width = parallaxImage.size.width
+                        let height = parallaxImage.size.height
                         
-                        parallaxImageView = UIImageView(frame: CGRectMake(0, 0, width! / height! * UIScreen.mainScreen().bounds.size.height, UIScreen.mainScreen().bounds.size.height))
-                        parallaxImageView.image = UIImage(data:data!)
-                        scrollView.addSubview(parallaxImageView)
+                        var setWidth = width / height * UIScreen.mainScreen().bounds.size.height
+                        if setWidth < UIScreen.mainScreen().bounds.size.width {
+                            setWidth = UIScreen.mainScreen().bounds.size.width
+                            
+                            parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                            parallaxImageView.image = parallaxImage
+                            view.addSubview(parallaxImageView)
+                            // Send to background layer
+                            view.sendSubviewToBack(parallaxImageView)
+                        }
+                        else {
+                            parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                            parallaxImageView.image = parallaxImage
+                            scrollView.addSubview(parallaxImageView)
+                        }
                     }
-                }//
+                    else {
+                        // you can use checkedUrl here
+                        let data = NSData(contentsOfURL:checkedUrl)
+                        if data != nil {
+                            let width = UIImage(data:data!)?.size.width
+                            let height = UIImage(data:data!)?.size.height
+                            
+                            var setWidth = width! / height! * UIScreen.mainScreen().bounds.size.height
+                            if setWidth < UIScreen.mainScreen().bounds.size.width {
+                                setWidth = UIScreen.mainScreen().bounds.size.width
+                                
+                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                parallaxImageView.image = UIImage(data:data!)
+                                parallaxImage = UIImage(data:data!)!
+                                view.addSubview(parallaxImageView)
+                                // Send to background layer
+                                view.sendSubviewToBack(parallaxImageView)
+                            }
+                            else {
+                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                parallaxImageView.image = UIImage(data:data!)
+                                parallaxImage = UIImage(data:data!)!
+                                scrollView.addSubview(parallaxImageView)
+                            }
+                        }
+                    }
+                }
             }
             else {
                 if let parallaxString = settings["parallaxBackgroundImage"] as? String {
                     isParallax = true
                     //
                     if let checkedUrl = NSURL(string: parallaxString) {
-                        // you can use checkedUrl here
-                        let data = NSData(contentsOfURL:checkedUrl)
-                        if data != nil {
-                            let width = UIImage(data:data!)?.size.width
-                            let height = UIImage(data:data!)?.size.height
-                            print("Widht - \(width), height - \(height)")
+                        if parallaxImage.size.width > 0 {
+                            let width = parallaxImage.size.width
+                            let height = parallaxImage.size.height
                             
-                            parallaxImageView = UIImageView(frame: CGRectMake(0, 0, width! / height! * UIScreen.mainScreen().bounds.size.height, UIScreen.mainScreen().bounds.size.height))
-                            parallaxImageView.image = UIImage(data:data!)
-                            scrollView.addSubview(parallaxImageView)
+                            var setWidth = width / height * UIScreen.mainScreen().bounds.size.height
+                            if setWidth < UIScreen.mainScreen().bounds.size.width {
+                                setWidth = UIScreen.mainScreen().bounds.size.width
+                                
+                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                parallaxImageView.image = parallaxImage
+                                view.addSubview(parallaxImageView)
+                                // Send to background layer
+                                view.sendSubviewToBack(parallaxImageView)
+                            }
+                            else {
+                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                parallaxImageView.image = parallaxImage
+                                scrollView.addSubview(parallaxImageView)
+                            }
+                        }
+                        else {
+                            // you can use checkedUrl here
+                            let data = NSData(contentsOfURL:checkedUrl)
+                            if data != nil {
+                                let width = UIImage(data:data!)?.size.width
+                                let height = UIImage(data:data!)?.size.height
+                                
+                                var setWidth = width! / height! * UIScreen.mainScreen().bounds.size.height
+                                if setWidth < UIScreen.mainScreen().bounds.size.width {
+                                    setWidth = UIScreen.mainScreen().bounds.size.width
+                                    
+                                    parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                    parallaxImageView.image = UIImage(data:data!)
+                                    parallaxImage = UIImage(data:data!)!
+                                    view.addSubview(parallaxImageView)
+                                    // Send to background layer
+                                    view.sendSubviewToBack(parallaxImageView)
+                                }
+                                else {
+                                    parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                    parallaxImageView.image = UIImage(data:data!)
+                                    parallaxImage = UIImage(data:data!)!
+                                    scrollView.addSubview(parallaxImageView)
+                                }
+                            }
                         }
                     }
                     //
@@ -120,13 +240,23 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                 
                 // Load background image
                 if let backgroundImageString = pages[i]["backgroundImage"] as? String {
-                    if let checkedUrl = NSURL(string: backgroundImageString) {
+                    // Check if we have a background image saved
+                    if let savedImage = backgroundImagesDictionary["\(i)"] {
+                        let backgroundImage = UIImageView(frame: CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.height))
+                        if !isParallax {
+                            backgroundImage.image = savedImage
+                        }
+                        pageView.addSubview(backgroundImage)
+                    }
+                        //
+                    else if let checkedUrl = NSURL(string: backgroundImageString) {
                         // you can use checkedUrl here
                         let data = NSData(contentsOfURL:checkedUrl)
                         if data != nil {
                             let backgroundImage = UIImageView(frame: CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.height))
                             if !isParallax {
                                 backgroundImage.image = UIImage(data:data!)
+                                backgroundImagesDictionary["\(i)"] = UIImage(data:data!)
                             }
                             pageView.addSubview(backgroundImage)
                         }
@@ -142,19 +272,59 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                 }
                 
                 var imageBottom: CGFloat = 0.0
+                
                 // Image
                 if let imageString = pages[i]["image"] as? String {
-                    if let checkedUrl = NSURL(string: imageString) {
+                    if let savedImage = imageDictionary["\(i)"] {
+                        var image = UIImageView()
+                        if currentOrientation == "Landscape" {
+                            let width = UIScreen.mainScreen().bounds.size.height - 206.0
+                            
+                            image = UIImageView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - width)/2, (UIScreen.mainScreen().bounds.size.height - width - 160.0)/2, width, width))
+                            
+                            imageBottom = (UIScreen.mainScreen().bounds.size.height - width - 160.0)/2 + 4.0 + width
+                        }
+                        else {
+                            image = UIImageView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - 300.0)/2, (UIScreen.mainScreen().bounds.size.height - 300.0 - 100.0)/2, 300.0, 300.0))
+                            
+                            imageBottom = (UIScreen.mainScreen().bounds.size.height - 300.0 - 100.0)/2 + 310.0
+                        }
+                        
+                        if !isParallax {
+                            image.image = savedImage
+                        }
+                        else {
+                            imageBottom = 0.0
+                        }
+                        
+                        pageView.addSubview(image)
+                    }
+                    else if let checkedUrl = NSURL(string: imageString) {
                         // you can use checkedUrl here
                         let data = NSData(contentsOfURL:checkedUrl)
                         if data != nil {
-                            let image = UIImageView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - 300.0)/2, (UIScreen.mainScreen().bounds.size.height - 300.0 - 80.0)/2, 300.0, 300.0))
-                            
-                            imageBottom = (UIScreen.mainScreen().bounds.size.height - 300.0 - 80.0)/2 + 310.0
+                            var image = UIImageView()
+                            if currentOrientation == "Landscape" {
+                                let width = UIScreen.mainScreen().bounds.size.height - 206.0
+                                
+                                image = UIImageView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - width)/2, (UIScreen.mainScreen().bounds.size.height - width - 160.0)/2, width, width))
+                                
+                                imageBottom = (UIScreen.mainScreen().bounds.size.height - width - 160.0)/2 + 4.0 + width
+                            }
+                            else {
+                                image = UIImageView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - 300.0)/2, (UIScreen.mainScreen().bounds.size.height - 300.0 - 100.0)/2, 300.0, 300.0))
+                                
+                                imageBottom = (UIScreen.mainScreen().bounds.size.height - 300.0 - 100.0)/2 + 310.0
+                            }
                             
                             if !isParallax {
                                 image.image = UIImage(data:data!)
+                                imageDictionary["\(i)"] = UIImage(data:data!)
                             }
+                            else {
+                                imageBottom = 0.0
+                            }
+                            
                             pageView.addSubview(image)
                         }
                     }
@@ -193,7 +363,6 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                         }
                     }
                 }
-                
             }
             
             // Skip button - top right
@@ -238,6 +407,10 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             
             // Page Control
             var pageControlY:CGFloat = 24.0
+            if currentOrientation == "Landscape" {
+                pageControlY = 4.0
+            }
+            
             // Check if page control is on the bottom
             if let pageIndicatorsPosition = settings["pageIndicatorsPosition"] as? String {
                 if pageIndicatorsPosition == "bottom" {
@@ -247,7 +420,21 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             
             pageControl = UIPageControl(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - 40.0)/2, pageControlY, 40.0, 16.0))
             pageControl.numberOfPages = pages.count
-            pageControl.currentPage = 0
+            
+            // If it's a rotation - set the continue button and navigate to the right page
+            if page != 100 {
+                pageControl.currentPage = page
+                
+                scrollView.setContentOffset(CGPointMake(UIScreen.mainScreen().bounds.size.width * CGFloat(pageControl.currentPage), 0), animated: false)
+                
+                if buttonTitles.count > 0 {
+                    continueButton.setTitle(buttonTitles[pageControl.currentPage], forState: UIControlState.Normal)
+                }
+            }
+            else {
+                pageControl.currentPage = 0
+                page = 0
+            }
             if let pageIndicatorColor = settings["pageIndicatorColor"] as? String {
                 pageControl.pageIndicatorTintColor = hexStringToUIColor(pageIndicatorColor)
             }
@@ -263,7 +450,6 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                     pageControl.alpha = 0.0
                 }
             }
-            
         }
     }
     
@@ -277,7 +463,8 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
         else {
             scrollView.setContentOffset(CGPointMake(UIScreen.mainScreen().bounds.size.width * CGFloat(pageNumber + 1), 0), animated: true)
             
-            pageControl.currentPage = pageNumber+1
+            pageControl.currentPage = pageNumber + 1
+            page = pageNumber + 1
             if buttonTitles.count > 0 {
                 continueButton.setTitle(buttonTitles[pageNumber+1], forState: UIControlState.Normal)
             }
@@ -293,12 +480,14 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
     func scrollViewDidScroll(scrollView: UIScrollView) {
         let pageNumber = round(scrollView.contentOffset.x / scrollView.frame.size.width)
         pageControl.currentPage = Int(pageNumber)
+        page = Int(pageNumber)
         parallaxAnimation()
     }
     
     func pageChanged() {
         let pageNumber = round(scrollView.contentOffset.x / scrollView.frame.size.width)
         pageControl.currentPage = Int(pageNumber)
+        page = Int(pageNumber)
         
         if buttonTitles.count > 0 {
             continueButton.setTitle(buttonTitles[Int(pageNumber)], forState: UIControlState.Normal)
@@ -308,33 +497,36 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func parallaxAnimation() {
-        if !isAnimating {
-            isAnimating = true
-            
-            // Move animation to change the parallax background position
-            UIView.animateWithDuration(0.2, animations: {
-                let width = self.parallaxImageView.frame.size.width
-                let height = self.parallaxImageView.frame.size.height
+        let width = self.parallaxImageView.frame.size.width
+        if width > UIScreen.mainScreen().bounds.size.width {
+            if !isAnimating {
+                isAnimating = true
                 
-                if self.pageControl.currentPage == 0 {
-                    self.parallaxImageView.frame = CGRectMake(0, 0, width, height)
-                }
-                else if self.pageControl.currentPage == self.buttonTitles.count - 1 {
-                    self.parallaxImageView.frame = CGRectMake(UIScreen.mainScreen().bounds.size.width * CGFloat(self.buttonTitles.count) - width, 0, width, height)
-                }
-                else {
-                    var offset = 0
-                    if self.buttonTitles.count > 3 {
-                        offset = self.buttonTitles.count - 3
-                    }
+                // Move animation to change the parallax background position
+                UIView.animateWithDuration(0.2, animations: {
+                    let width = self.parallaxImageView.frame.size.width
+                    let height = self.parallaxImageView.frame.size.height
                     
-                    if self.parallaxImageView.frame != CGRectMake((UIScreen.mainScreen().bounds.size.width * 3.0 - width)/2 + CGFloat(offset) * UIScreen.mainScreen().bounds.size.width, 0, width, height) {
-
-                        self.parallaxImageView.frame = CGRectMake((UIScreen.mainScreen().bounds.size.width * 3.0 - width)/2 + CGFloat(offset) * UIScreen.mainScreen().bounds.size.width, 0, width, height)
+                    if self.pageControl.currentPage == 0 {
+                        self.parallaxImageView.frame = CGRectMake(0, 0, width, height)
                     }
+                    else if self.pageControl.currentPage == self.buttonTitles.count - 1 {
+                        self.parallaxImageView.frame = CGRectMake(UIScreen.mainScreen().bounds.size.width * CGFloat(self.buttonTitles.count) - width, 0, width, height)
+                    }
+                    else {
+                        var offset = 0
+                        if self.buttonTitles.count > 3 {
+                            offset = self.buttonTitles.count - 3
+                        }
+                        
+                        if self.parallaxImageView.frame != CGRectMake((UIScreen.mainScreen().bounds.size.width * 3.0 - width)/2 + CGFloat(offset) * UIScreen.mainScreen().bounds.size.width, 0, width, height) {
+                            
+                            self.parallaxImageView.frame = CGRectMake((UIScreen.mainScreen().bounds.size.width * 3.0 - width)/2 + CGFloat(offset) * UIScreen.mainScreen().bounds.size.width, 0, width, height)
+                        }
+                    }
+                }) { (true) in
+                    self.isAnimating = false
                 }
-            }) { (true) in
-                self.isAnimating = false
             }
         }
     }
@@ -351,8 +543,6 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func createCard(card : Dictionary<String, AnyObject>) {
-        print(card)
-        
         // Load the font
         var cardFont = "HelveticaNeue"
         if let loadedFont = card["font"] as? String {
@@ -383,15 +573,22 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             }
             
             // Load header image
-            if let imgURL = header["bg_img"] as? String {
+            
+            if headerImageSaved.size.width > 0 {
+                let headerImage = UIImageView(frame: CGRectMake(0, 0, cardView.frame.width, 132.0))
+                headerImage.image = headerImageSaved
+                cardView.addSubview(headerImage)
+            }
+            else if let imgURL = header["bg_img"] as? String {
                 if let checkedUrl = NSURL(string: imgURL) {
                     // you can use checkedUrl here
-                    print(checkedUrl)
+                    //                    print(checkedUrl)
                     
                     let data = NSData(contentsOfURL:checkedUrl)
                     if data != nil {
                         let headerImage = UIImageView(frame: CGRectMake(0, 0, cardView.frame.width, 132.0))
                         headerImage.image = UIImage(data:data!)
+                        headerImageSaved = UIImage(data:data!)!
                         cardView.addSubview(headerImage)
                     }
                 }
@@ -454,8 +651,13 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             if features.count > 0 {
                 // Creating a scroll view for features
                 let scrollView = UIScrollView(frame: CGRectMake(0, 132, cardView.frame.width, cardView.frame.height - 132.0 - 67 - 22))
-                scrollView.contentSize = CGSize(width: cardView.frame.width, height: 20.0 + 70.0 * CGFloat(features.count) + 60.0)
+                scrollView.contentSize = CGSize(width: cardView.frame.width, height: 20.0 + 70.0 * CGFloat(features.count))
                 cardView.addSubview(scrollView)
+                
+                cardView.alpha = 0.0
+                UIView.animateWithDuration(0.25, animations: {
+                    cardView.alpha = 1.0
+                })
                 
                 for i in 0..<features.count {
                     var description = ""
@@ -533,7 +735,6 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
         }
         
         let request = NSMutableURLRequest(URL: NSURL(string: requestString)!)
-        
         let session = NSURLSession.sharedSession()
         
         /*
@@ -564,7 +765,8 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                         if let json = jsonResult as? Dictionary<String, AnyObject> {
                             dispatch_async(dispatch_get_main_queue()) {
                                 () -> Void in
-                                self.checkTheResponse(json)
+                                self.serverResponse = json
+                                self.checkTheResponse()//(json)
                             }
                         }
                     }
@@ -579,6 +781,35 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
         })
         
         task.resume()
+    }
+    
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        if UIDevice.currentDevice().orientation.isLandscape.boolValue {
+            if currentOrientation != "Landscape" {
+                currentOrientation = "Landscape"
+                
+                rotateTheView()
+            }
+        } else {
+            if currentOrientation != "Portrait" {
+                currentOrientation = "Portrait"
+                
+                rotateTheView()
+            }
+        }
+    }
+    
+    func rotateTheView() {
+        
+        activityIndicator.alpha = 1.0
+        buttonTitles = [String]()
+        for view in self.view.subviews {
+            view.removeFromSuperview()
+        }
+        
+        createActivityIndicator()
+        
+        performSelector(#selector(RaiseMetricsViewController.loadNotes), withObject: nil, afterDelay: 0.05)
     }
     
     func hexStringToUIColor (hex:String) -> UIColor {
