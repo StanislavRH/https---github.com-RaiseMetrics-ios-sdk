@@ -37,7 +37,6 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
         createActivityIndicator()
         
         loadNotes()
-        // Do any additional setup after loading the view.
     }
     
     func createActivityIndicator() {
@@ -99,14 +98,39 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
     
     func createOnboarding(pages : [Dictionary<String, AnyObject>], settings : Dictionary<String, AnyObject>) {
         if pages.count > 0 {
+            var isiPad = false
+            let onboardingCard = UIView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - 375.0)/2, (UIScreen.mainScreen().bounds.size.height - 667.0)/2, 375.0, 667.0))
+            onboardingCard.layer.cornerRadius = 8.0
+            onboardingCard.layer.masksToBounds = true
+            var viewWidth = UIScreen.mainScreen().bounds.size.width
+            var viewHeight = UIScreen.mainScreen().bounds.size.height
+            
+            // Check the device type
+            if (UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad)
+            {
+                // It's an iPad
+                isiPad = true
+                // Create a card view for objects
+                view.addSubview(onboardingCard)
+                viewWidth = 375.0
+                viewHeight = 667.0
+            }
+            
             // Creating the horizontal scroll view and setting the number of pages on it
-            scrollView = UIScrollView(frame: CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.height))
-            scrollView.contentSize = CGSize(width: UIScreen.mainScreen().bounds.size.width * CGFloat(pages.count), height: UIScreen.mainScreen().bounds.size.height)
+            scrollView = UIScrollView(frame: CGRectMake(0, 0, viewWidth, viewHeight))
+            scrollView.contentSize = CGSize(width: viewWidth * CGFloat(pages.count), height: viewHeight)
+            if isiPad {
+                onboardingCard.addSubview(scrollView)
+            }
+            else {
+                view.addSubview(scrollView)
+            }
+            
+            // Setting the scroll view parameters
             scrollView.pagingEnabled = true
             scrollView.showsHorizontalScrollIndicator = false
             scrollView.delegate = self
             scrollView.bounces = false
-            view.addSubview(scrollView)
             activityIndicator.alpha = 0.0
             
             scrollView.alpha = 0.0
@@ -127,18 +151,18 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                         let width = parallaxImage.size.width
                         let height = parallaxImage.size.height
                         
-                        var setWidth = width / height * UIScreen.mainScreen().bounds.size.height
-                        if setWidth < UIScreen.mainScreen().bounds.size.width {
-                            setWidth = UIScreen.mainScreen().bounds.size.width
+                        var setWidth = width / height * viewHeight
+                        if setWidth < viewWidth * 1.5 {
+                            setWidth = viewWidth
                             
-                            parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                            parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, viewHeight))
                             parallaxImageView.image = parallaxImage
                             view.addSubview(parallaxImageView)
                             // Send to background layer
                             view.sendSubviewToBack(parallaxImageView)
                         }
                         else {
-                            parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                            parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, viewHeight))
                             parallaxImageView.image = parallaxImage
                             scrollView.addSubview(parallaxImageView)
                         }
@@ -150,11 +174,11 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                             let width = UIImage(data:data!)?.size.width
                             let height = UIImage(data:data!)?.size.height
                             
-                            var setWidth = width! / height! * UIScreen.mainScreen().bounds.size.height
-                            if setWidth < UIScreen.mainScreen().bounds.size.width {
-                                setWidth = UIScreen.mainScreen().bounds.size.width
+                            var setWidth = width! / height! * viewHeight
+                            if setWidth < viewWidth * 1.5 {
+                                setWidth = viewWidth
                                 
-                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, viewHeight))
                                 parallaxImageView.image = UIImage(data:data!)
                                 parallaxImage = UIImage(data:data!)!
                                 view.addSubview(parallaxImageView)
@@ -162,7 +186,7 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                                 view.sendSubviewToBack(parallaxImageView)
                             }
                             else {
-                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, viewHeight))
                                 parallaxImageView.image = UIImage(data:data!)
                                 parallaxImage = UIImage(data:data!)!
                                 scrollView.addSubview(parallaxImageView)
@@ -180,18 +204,18 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                             let width = parallaxImage.size.width
                             let height = parallaxImage.size.height
                             
-                            var setWidth = width / height * UIScreen.mainScreen().bounds.size.height
-                            if setWidth < UIScreen.mainScreen().bounds.size.width {
-                                setWidth = UIScreen.mainScreen().bounds.size.width
+                            var setWidth = width / height * viewHeight
+                            if setWidth < viewWidth * 1.5 {
+                                setWidth = viewWidth
                                 
-                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, viewHeight))
                                 parallaxImageView.image = parallaxImage
                                 view.addSubview(parallaxImageView)
                                 // Send to background layer
                                 view.sendSubviewToBack(parallaxImageView)
                             }
                             else {
-                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, viewHeight))
                                 parallaxImageView.image = parallaxImage
                                 scrollView.addSubview(parallaxImageView)
                             }
@@ -203,11 +227,11 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                                 let width = UIImage(data:data!)?.size.width
                                 let height = UIImage(data:data!)?.size.height
                                 
-                                var setWidth = width! / height! * UIScreen.mainScreen().bounds.size.height
-                                if setWidth < UIScreen.mainScreen().bounds.size.width {
-                                    setWidth = UIScreen.mainScreen().bounds.size.width
+                                var setWidth = width! / height! * viewHeight
+                                if setWidth < viewWidth * 1.5 {
+                                    setWidth = viewWidth
                                     
-                                    parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                    parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, viewHeight))
                                     parallaxImageView.image = UIImage(data:data!)
                                     parallaxImage = UIImage(data:data!)!
                                     view.addSubview(parallaxImageView)
@@ -215,7 +239,7 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                                     view.sendSubviewToBack(parallaxImageView)
                                 }
                                 else {
-                                    parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, UIScreen.mainScreen().bounds.size.height))
+                                    parallaxImageView = UIImageView(frame: CGRectMake(0, 0, setWidth, viewHeight))
                                     parallaxImageView.image = UIImage(data:data!)
                                     parallaxImage = UIImage(data:data!)!
                                     scrollView.addSubview(parallaxImageView)
@@ -229,7 +253,7 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             
             for i in 0..<pages.count {
                 // Creating the view for the current page
-                let pageView = UIView(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width * CGFloat(i), 0, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.height))
+                let pageView = UIView(frame: CGRectMake(viewWidth * CGFloat(i), 0, viewWidth, viewHeight))
                 scrollView.addSubview(pageView)
                 
                 // Save button titles
@@ -239,12 +263,14 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                 }
                 
                 // Load background image
-                if let backgroundImageString = pages[i]["backgroundImage"] as? String {
+                if let backgroundImageString = pages[i]["image"] as? String {
                     // Check if we have a background image saved
                     if let savedImage = backgroundImagesDictionary["\(i)"] {
-                        let backgroundImage = UIImageView(frame: CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.height))
+                        let backgroundImage = UIImageView(frame: CGRectMake(0, 0, viewWidth, viewHeight))
                         if !isParallax {
                             backgroundImage.image = savedImage
+                            backgroundImage.contentMode = .ScaleAspectFill
+                            backgroundImage.layer.masksToBounds = true
                         }
                         pageView.addSubview(backgroundImage)
                     }
@@ -253,9 +279,11 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                         // you can use checkedUrl here
                         let data = NSData(contentsOfURL:checkedUrl)
                         if data != nil {
-                            let backgroundImage = UIImageView(frame: CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.height))
+                            let backgroundImage = UIImageView(frame: CGRectMake(0, 0, viewWidth, viewHeight))
                             if !isParallax {
                                 backgroundImage.image = UIImage(data:data!)
+                                backgroundImage.contentMode = .ScaleAspectFill
+                                backgroundImage.layer.masksToBounds = true
                                 backgroundImagesDictionary["\(i)"] = UIImage(data:data!)
                             }
                             pageView.addSubview(backgroundImage)
@@ -274,20 +302,23 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                 var imageBottom: CGFloat = 0.0
                 
                 // Image
-                if let imageString = pages[i]["image"] as? String {
+                if let imageString = pages[i]["backgroundImage"] as? String {
                     if let savedImage = imageDictionary["\(i)"] {
                         var image = UIImageView()
                         if currentOrientation == "Landscape" {
-                            let width = UIScreen.mainScreen().bounds.size.height - 206.0
+                            var width = viewHeight - 206.0
+                            if isiPad && width > 375.0 {
+                                width = 375.0
+                            }
                             
-                            image = UIImageView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - width)/2, (UIScreen.mainScreen().bounds.size.height - width - 160.0)/2, width, width))
+                            image = UIImageView(frame: CGRectMake((viewWidth - width)/2, (viewHeight - width - 160.0)/2, width, width))
                             
-                            imageBottom = (UIScreen.mainScreen().bounds.size.height - width - 160.0)/2 + 4.0 + width
+                            imageBottom = (viewHeight - width - 160.0)/2 + 4.0 + width
                         }
                         else {
-                            image = UIImageView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - 300.0)/2, (UIScreen.mainScreen().bounds.size.height - 300.0 - 100.0)/2, 300.0, 300.0))
+                            image = UIImageView(frame: CGRectMake((viewWidth - 300.0)/2, (viewHeight - 300.0 - 100.0)/2, 300.0, 300.0))
                             
-                            imageBottom = (UIScreen.mainScreen().bounds.size.height - 300.0 - 100.0)/2 + 310.0
+                            imageBottom = (viewHeight - 300.0 - 100.0)/2 + 310.0
                         }
                         
                         if !isParallax {
@@ -305,16 +336,19 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                         if data != nil {
                             var image = UIImageView()
                             if currentOrientation == "Landscape" {
-                                let width = UIScreen.mainScreen().bounds.size.height - 206.0
+                                var width = viewHeight - 206.0
+                                if isiPad && width > 375.0 {
+                                    width = 375.0
+                                }
                                 
-                                image = UIImageView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - width)/2, (UIScreen.mainScreen().bounds.size.height - width - 160.0)/2, width, width))
+                                image = UIImageView(frame: CGRectMake((viewWidth - width)/2, (viewHeight - width - 160.0)/2, width, width))
                                 
-                                imageBottom = (UIScreen.mainScreen().bounds.size.height - width - 160.0)/2 + 4.0 + width
+                                imageBottom = (viewHeight - width - 160.0)/2 + 4.0 + width
                             }
                             else {
-                                image = UIImageView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - 300.0)/2, (UIScreen.mainScreen().bounds.size.height - 300.0 - 100.0)/2, 300.0, 300.0))
+                                image = UIImageView(frame: CGRectMake((viewWidth - 300.0)/2, (viewHeight - 300.0 - 100.0)/2, 300.0, 300.0))
                                 
-                                imageBottom = (UIScreen.mainScreen().bounds.size.height - 300.0 - 100.0)/2 + 310.0
+                                imageBottom = (viewHeight - 300.0 - 100.0)/2 + 310.0
                             }
                             
                             if !isParallax {
@@ -336,13 +370,13 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                     titleTop = imageBottom
                 }
                 else {
-                    titleTop = (UIScreen.mainScreen().bounds.size.height - 30.0 - 80.0)/2
+                    titleTop = (viewHeight - 30.0 - 80.0)/2
                 }
                 
                 // Placing a page title
                 if let pageTitle = pages[i]["title"] as? String {
                     if let pageTitleColor = pages[i]["titleColor"] as? String {
-                        let pageTitleLabel = UILabel(frame: CGRectMake(32.0, titleTop, UIScreen.mainScreen().bounds.size.width - 64.0, 30.0))
+                        let pageTitleLabel = UILabel(frame: CGRectMake(32.0, titleTop, viewWidth - 64.0, 30.0))
                         pageTitleLabel.textColor = hexStringToUIColor(pageTitleColor)
                         pageTitleLabel.text = pageTitle
                         pageTitleLabel.textAlignment = NSTextAlignment.Center
@@ -352,7 +386,7 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                         // Placing a page description
                         if let description = pages[i]["description"] as? String {
                             if let descriptionColor = pages[i]["descriptionColor"] as? String {
-                                let descriptionLabel = UILabel(frame: CGRectMake(32.0, titleTop + 30.0, UIScreen.mainScreen().bounds.size.width - 64.0, 44.0))
+                                let descriptionLabel = UILabel(frame: CGRectMake(32.0, titleTop + 30.0, viewWidth - 64.0, 44.0))
                                 descriptionLabel.textColor = hexStringToUIColor(descriptionColor)
                                 descriptionLabel.text = description
                                 descriptionLabel.textAlignment = NSTextAlignment.Center
@@ -369,12 +403,18 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             if let skipButtonColorString = settings["skipButtonColor"] as? String {
                 if let skipButtonColorHighlightedString = settings["skipButtonColorHighlighted"] as? String {
                     if let skipButtonTitleString = settings["skipButtonTitle"] as? String {
-                        let skipButton = UIButton(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width - 40.0 - 8.0, 24.0, 40.0, 22.0))
+                        let skipButton = UIButton(frame: CGRectMake(viewWidth - 40.0 - 8.0, 24.0, 40.0, 22.0))
                         skipButton.setTitleColor(hexStringToUIColor(skipButtonColorString), forState: UIControlState.Normal)
                         skipButton.setTitleColor(hexStringToUIColor(skipButtonColorHighlightedString), forState: UIControlState.Highlighted)
                         skipButton.setTitle(skipButtonTitleString, forState: UIControlState.Normal)
                         skipButton.addTarget(self, action: #selector(RaiseMetricsViewController.closeTheView), forControlEvents: UIControlEvents.TouchUpInside)
-                        view.addSubview(skipButton)
+                        
+                        if isiPad {
+                            onboardingCard.addSubview(skipButton)
+                        }
+                        else {
+                            view.addSubview(skipButton)
+                        }
                         
                         // Check if Skip button is visible
                         if let showSkipButton = settings["showSkipButton"] as? Int {
@@ -390,7 +430,7 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             if let staticContinueButtonBackgroundColorString = settings["staticContinueButtonBackgroundColor"] as? String {
                 if let staticContinueButtonCornerRadiusNumber = settings["staticContinueButtonCornerRadius"] as? Int {
                     if let staticContinueButtonTitleColorString = settings["staticContinueButtonTitleColor"] as? String {
-                        continueButton = UIButton(frame: CGRectMake(32.0, UIScreen.mainScreen().bounds.size.height - 80.0, UIScreen.mainScreen().bounds.size.width - 64.0, 60.0))
+                        continueButton = UIButton(frame: CGRectMake(32.0, viewHeight - 80.0, viewWidth - 64.0, 60.0))
                         // The standard title is the one from the Page 1
                         if buttonTitles.count > 0 {
                             continueButton.setTitle(buttonTitles[0], forState: UIControlState.Normal)
@@ -400,7 +440,14 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                         continueButton.layer.cornerRadius = CGFloat(staticContinueButtonCornerRadiusNumber)
                         continueButton.setTitleColor(hexStringToUIColor(staticContinueButtonTitleColorString), forState: UIControlState.Normal)
                         continueButton.addTarget(self, action: #selector(RaiseMetricsViewController.continueButtonPressed), forControlEvents: UIControlEvents.TouchUpInside)
-                        view.addSubview(continueButton)
+                        
+                        
+                        if isiPad {
+                            onboardingCard.addSubview(continueButton)
+                        }
+                        else {
+                            view.addSubview(continueButton)
+                        }
                     }
                 }
             }
@@ -414,18 +461,18 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             // Check if page control is on the bottom
             if let pageIndicatorsPosition = settings["pageIndicatorsPosition"] as? String {
                 if pageIndicatorsPosition == "bottom" {
-                    pageControlY = UIScreen.mainScreen().bounds.size.height - 100.0
+                    pageControlY = viewHeight - 100.0
                 }
             }
             
-            pageControl = UIPageControl(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - 40.0)/2, pageControlY, 40.0, 16.0))
+            pageControl = UIPageControl(frame: CGRectMake((viewWidth - 40.0)/2, pageControlY, 40.0, 16.0))
             pageControl.numberOfPages = pages.count
             
             // If it's a rotation - set the continue button and navigate to the right page
             if page != 100 {
                 pageControl.currentPage = page
                 
-                scrollView.setContentOffset(CGPointMake(UIScreen.mainScreen().bounds.size.width * CGFloat(pageControl.currentPage), 0), animated: false)
+                scrollView.setContentOffset(CGPointMake(viewWidth * CGFloat(pageControl.currentPage), 0), animated: false)
                 
                 if buttonTitles.count > 0 {
                     continueButton.setTitle(buttonTitles[pageControl.currentPage], forState: UIControlState.Normal)
@@ -442,7 +489,12 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                 pageControl.currentPageIndicatorTintColor = hexStringToUIColor(pageIndicatorColorSelected)
             }
             
-            view.addSubview(pageControl)
+            if isiPad {
+                onboardingCard.addSubview(pageControl)
+            }
+            else {
+                view.addSubview(pageControl)
+            }
             
             // Check if we should display page indicators
             if let showPageIndicators = settings["showPageIndicators"] as? Int {
@@ -454,6 +506,14 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func continueButtonPressed() {
+        var viewWidth = UIScreen.mainScreen().bounds.size.width
+        // Check the device type
+        if (UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad)
+        {
+            // It's an iPad
+            viewWidth = 375.0
+        }
+        
         // Checkig the current page and scrolling the view to the next, if the last page is opened we close the view
         let pageNumber = Int(round(scrollView.contentOffset.x / scrollView.frame.size.width))
         
@@ -461,9 +521,9 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             closeTheView()
         }
         else {
-            scrollView.setContentOffset(CGPointMake(UIScreen.mainScreen().bounds.size.width * CGFloat(pageNumber + 1), 0), animated: true)
+            scrollView.setContentOffset(CGPointMake(viewWidth * CGFloat(pageNumber + 1), 0), animated: true)
             
-            pageControl.currentPage = pageNumber + 1
+            pageControl.currentPage = pageNumber
             page = pageNumber + 1
             if buttonTitles.count > 0 {
                 continueButton.setTitle(buttonTitles[pageNumber+1], forState: UIControlState.Normal)
@@ -497,8 +557,16 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func parallaxAnimation() {
+        var viewWidth = UIScreen.mainScreen().bounds.size.width
+        // Check the device type
+        if (UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad)
+        {
+            // It's an iPad
+            viewWidth = 375.0
+        }
+        
         let width = self.parallaxImageView.frame.size.width
-        if width > UIScreen.mainScreen().bounds.size.width {
+        if width >= viewWidth * 1.5 {
             if !isAnimating {
                 isAnimating = true
                 
@@ -511,7 +579,7 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                         self.parallaxImageView.frame = CGRectMake(0, 0, width, height)
                     }
                     else if self.pageControl.currentPage == self.buttonTitles.count - 1 {
-                        self.parallaxImageView.frame = CGRectMake(UIScreen.mainScreen().bounds.size.width * CGFloat(self.buttonTitles.count) - width, 0, width, height)
+                        self.parallaxImageView.frame = CGRectMake(viewWidth * CGFloat(self.buttonTitles.count) - width, 0, width, height)
                     }
                     else {
                         var offset = 0
@@ -519,9 +587,9 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
                             offset = self.buttonTitles.count - 3
                         }
                         
-                        if self.parallaxImageView.frame != CGRectMake((UIScreen.mainScreen().bounds.size.width * 3.0 - width)/2 + CGFloat(offset) * UIScreen.mainScreen().bounds.size.width, 0, width, height) {
+                        if self.parallaxImageView.frame != CGRectMake((viewWidth * 3.0 - width)/2 + CGFloat(offset) * viewWidth, 0, width, height) {
                             
-                            self.parallaxImageView.frame = CGRectMake((UIScreen.mainScreen().bounds.size.width * 3.0 - width)/2 + CGFloat(offset) * UIScreen.mainScreen().bounds.size.width, 0, width, height)
+                            self.parallaxImageView.frame = CGRectMake((viewWidth * 3.0 - width)/2 + CGFloat(offset) * viewWidth, 0, width, height)
                         }
                     }
                 }) { (true) in
@@ -552,7 +620,20 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
         }
         
         // Creating the card view
-        let cardView = UIView(frame: CGRectMake(20.0, 20.0, UIScreen.mainScreen().bounds.size.width - 40.0, UIScreen.mainScreen().bounds.size.height - 40.0))
+        var cardView = UIView()
+        
+        // Check the device type
+        if (UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad)
+        {
+            // It's an iPad
+            cardView = UIView(frame: CGRectMake((UIScreen.mainScreen().bounds.size.width - 375.0)/2, (UIScreen.mainScreen().bounds.size.height - 667.0)/2, 375.0, 667.0))
+        }
+        else
+        {
+            // It's an iPhone
+            cardView = UIView(frame: CGRectMake(20.0, 20.0, UIScreen.mainScreen().bounds.size.width - 40.0, UIScreen.mainScreen().bounds.size.height - 40.0))
+        }
+        
         cardView.backgroundColor = UIColor.whiteColor()
         view.addSubview(cardView)
         
@@ -575,21 +656,47 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
             // Load header image
             
             if headerImageSaved.size.width > 0 {
-                let headerImage = UIImageView(frame: CGRectMake(0, 0, cardView.frame.width, 132.0))
-                headerImage.image = headerImageSaved
-                cardView.addSubview(headerImage)
+                // Check the device type
+                if (UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad)
+                {
+                    // It's an iPad
+                    let headerImage = UIImageView(frame: CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.height))
+                    headerImage.image = headerImageSaved
+                    headerImage.contentMode = .ScaleAspectFill
+                    view.addSubview(headerImage)
+                    view.sendSubviewToBack(headerImage)
+                }
+                else
+                {
+                    // It's an iPhone
+                    let headerImage = UIImageView(frame: CGRectMake(0, 0, cardView.frame.width, 132.0))
+                    headerImage.image = headerImageSaved
+                    cardView.addSubview(headerImage)
+                }
             }
             else if let imgURL = header["bg_img"] as? String {
                 if let checkedUrl = NSURL(string: imgURL) {
-                    // you can use checkedUrl here
-                    //                    print(checkedUrl)
-                    
                     let data = NSData(contentsOfURL:checkedUrl)
                     if data != nil {
-                        let headerImage = UIImageView(frame: CGRectMake(0, 0, cardView.frame.width, 132.0))
-                        headerImage.image = UIImage(data:data!)
                         headerImageSaved = UIImage(data:data!)!
-                        cardView.addSubview(headerImage)
+                        
+                        // Check the device type
+                        if (UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad)
+                        {
+                            // It's an iPad
+                            let headerImage = UIImageView(frame: CGRectMake(0, 0, UIScreen.mainScreen().bounds.size.width, UIScreen.mainScreen().bounds.size.height))
+                            headerImage.image = UIImage(data:data!)
+                            headerImage.contentMode = .ScaleAspectFill
+                            view.addSubview(headerImage)
+                            view.sendSubviewToBack(headerImage)
+                        }
+                        else
+                        {
+                            // It's an iPhone
+                            let headerImage = UIImageView(frame: CGRectMake(0, 0, cardView.frame.width, 132.0))
+                            headerImage.image = UIImage(data:data!)
+                            cardView.addSubview(headerImage)
+                        }
                     }
                 }
             }
@@ -800,7 +907,6 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func rotateTheView() {
-        
         activityIndicator.alpha = 1.0
         buttonTitles = [String]()
         for view in self.view.subviews {

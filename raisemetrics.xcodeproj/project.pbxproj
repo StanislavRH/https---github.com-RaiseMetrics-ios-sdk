@@ -423,6 +423,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.raisemetrics.raisemetrics;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "3ca7bd60-05b6-409a-aaeb-872c6e37bd4c";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -437,6 +438,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.raisemetrics.raisemetrics;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "3ca7bd60-05b6-409a-aaeb-872c6e37bd4c";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
