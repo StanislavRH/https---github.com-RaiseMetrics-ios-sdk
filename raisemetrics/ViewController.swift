@@ -28,8 +28,9 @@ class ViewController: UIViewController {
         
 //        let langId = NSLocale.currentLocale().objectForKey(NSLocaleLanguageCode) as! String
 //        let countryId = NSLocale.currentLocale().objectForKey(NSLocaleCountryCode) as! String
-//        let language = "\(langId)-\(countryId)" // en-US on my machine
-//        
+//        let language = "\(langId)           -\(countryId)" // en-US on my machine
+//        print(language)
+        
 //        print(NSLocale.currentLocale().localeIdentifier)
         
         

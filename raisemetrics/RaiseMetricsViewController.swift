@@ -835,12 +835,16 @@ class RaiseMetricsViewController: UIViewController, UIScrollViewDelegate {
     }
     
     func loadNotes() {
+        let langId = NSLocale.currentLocale().objectForKey(NSLocaleLanguageCode) as! String
+        
         // Checking the version and creating the request string, now we have 3 options: 1.0.2 version, 1.0.3 version and onboarding
-        var requestString = "http://api.raisemetrics.com/v1/release-notes/com.fliptrendy.fliptrendy?client_id=7e13cc7680ee242bbe722d3fcbe872e&app_version=\(version)"
+        var requestString = "http://api.raisemetrics.com/v1/release-notes/com.fliptrendy.fliptrendy?client_id=7e13cc7680ee242bbe722d3fcbe872e&app_version=\(version)&lang=\(langId)"
         if version == "onboarding" || version == "onboardingWithParallax" {
-            requestString = "http://api.raisemetrics.com/v1/onboarding/com.fliptrendy.fliptrendy?client_id=7e13cc7680ee242bbe722d3fcbe872e"
+            requestString = "http://api.raisemetrics.com/v1/onboarding/com.fliptrendy.fliptrendy?client_id=7e13cc7680ee242bbe722d3fcbe872e&lang=\(langId)"
         }
         
+        print(requestString)
+                
         let request = NSMutableURLRequest(URL: NSURL(string: requestString)!)
         let session = NSURLSession.sharedSession()
         
